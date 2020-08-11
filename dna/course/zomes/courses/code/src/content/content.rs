@@ -2,28 +2,40 @@ use hdk::{
     entry_definition::ValidatingEntryType,
     holochain_core_types::{dna::entry_types::Sharing, validation::EntryValidationData},
     holochain_json_api::{error::JsonError, json::JsonString},
-    //   holochain_persistence_api::cas::content::Address,
+    holochain_persistence_api::cas::content::Address,
 };
 use holochain_entry_utils::HolochainEntry;
 
 #[derive(Serialize, Deserialize, Debug, DefaultJson, Clone)]
 pub struct Content {
     pub title: String,
+    pub url: String,
+    pub description: String,
     pub timestamp: u64,
+    pub section_anchor_address: Address,
+}
+
+impl Content {
+    pub fn new(
+        title: String,
+        url: String,
+        description: String,
+        timestamp: u64,
+        section_anchor_address: Address,
+    ) -> Self {
+        Content {
+            title: title,
+            url: url,
+            description: description,
+            timestamp: timestamp,
+            section_anchor_address: section_anchor_address,
+        }
+    }
 }
 
 impl HolochainEntry for Content {
     fn entry_type() -> String {
         String::from("content")
-    }
-}
-
-impl Content {
-    pub fn new(title: String, timestamp: u64) -> Self {
-        Content {
-            title: title,
-            timestamp: timestamp,
-        }
     }
 }
 
@@ -49,7 +61,6 @@ pub fn content_entry_def() -> ValidatingEntryType {
                 }
             }
         },
-        // All links that content should have are defined for SectionAnchor and so this entry doesn't have any
         links: []
     )
 }

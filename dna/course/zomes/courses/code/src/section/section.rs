@@ -9,23 +9,30 @@ use holochain_entry_utils::HolochainEntry;
 #[derive(Serialize, Deserialize, Debug, DefaultJson, Clone)]
 pub struct Section {
     pub title: String,
-    pub section_anchor: Address,
+    pub course_anchor_address: Address,
     pub timestamp: u64,
+    pub section_anchor: Address,
+}
+
+impl Section {
+    pub fn new(
+        title: String,
+        course_anchor_address: Address,
+        timestamp: u64,
+        section_anchor: Address,
+    ) -> Self {
+        Section {
+            title: title,
+            course_anchor_address: course_anchor_address,
+            timestamp: timestamp,
+            section_anchor: section_anchor,
+        }
+    }
 }
 
 impl HolochainEntry for Section {
     fn entry_type() -> String {
         String::from("section")
-    }
-}
-
-impl Section {
-    pub fn new(title: String, section_anchor: Address, timestamp: u64) -> Self {
-        Section {
-            title: title,
-            section_anchor: section_anchor,
-            timestamp: timestamp,
-        }
     }
 }
 
