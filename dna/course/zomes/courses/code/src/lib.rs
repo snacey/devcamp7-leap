@@ -54,9 +54,22 @@ mod courses {
         course::entry::course_entry_def()
     }
 
-    // Section
+        // Section
     // TODO: implement section entry definitions
+    #[entry_def]
+    fn section_anchor_entry_definition() -> ValidatingEntryType {
+        course::section_anchor::section_anchor_entry_def()
+    }
+
+    #[entry_def]
+    fn section_entry_definition() -> ValidatingEntryType {
+        course::section::section_entry_def()
+    }
 
     // Content
     // TODO: implement content entry definition
+    #[entry_def]
+    fn content_entry_definition() -> ValidatingEntryType {
+        course::content::content_entry_def()
+    }
 }
