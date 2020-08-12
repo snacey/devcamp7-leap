@@ -23,8 +23,8 @@ use hdk_proc_macros::zome;
 mod anchor_trait;
 mod content;
 mod course;
-mod section;
 mod helper;
+mod section;
 
 #[zome]
 mod courses {
@@ -104,12 +104,13 @@ mod courses {
         course::handlers::get_my_enrolled_courses()
     }
 
-    // Section
-    // TODO: implement section entry definitions
+    // ============================ Section Definitions
+
     #[entry_def]
     fn section_anchor_entry_definition() -> ValidatingEntryType {
         section::section_anchor::section_anchor_entry_def()
     }
+
     // TODO: implement section CRUD methods
 
     #[entry_def]
@@ -117,11 +118,12 @@ mod courses {
         section::section::section_entry_def()
     }
 
-    // Content
-    // TODO: implement content entry definition
+    // =========================== Content Definitions
+
     #[entry_def]
     fn content_entry_definition() -> ValidatingEntryType {
         content::content::content_entry_def()
     }
+
     // TODO: implement content CRUD methods
 }
