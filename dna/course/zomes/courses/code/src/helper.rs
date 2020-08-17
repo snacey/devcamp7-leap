@@ -1,8 +1,9 @@
-use hdk::{
-    error::{ZomeApiError, ZomeApiResult},
-    holochain_persistence_api::cas::content::Address,
-    prelude::LinkMatch,
-};
+// use hdk::{
+//     error::{ZomeApiError, ZomeApiResult},
+//     holochain_persistence_api::cas::content::Address,
+//     prelude::LinkMatch,
+// };
+use hdk::prelude::*;
 use holochain_entry_utils::HolochainEntry;
 
 // gets latest data entry that is linked to anchor at entry_anchor_address

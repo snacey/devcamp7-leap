@@ -1,5 +1,5 @@
 use hdk::prelude::*;
-use hdk::{entry_definition::ValidatingEntryType, holochain_core_types::dna::entry_types::Sharing};
+// use hdk::{entry_definition::ValidatingEntryType, holochain_core_types::dna::entry_types::Sharing};
 
 use super::anchor::CourseAnchor;
 use crate::anchor_trait::AnchorTrait;
