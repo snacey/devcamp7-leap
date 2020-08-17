@@ -1,2 +1,3 @@
-pub mod section;
-pub mod section_anchor;
+pub mod anchor;
+pub mod entry;
+pub mod handlers;

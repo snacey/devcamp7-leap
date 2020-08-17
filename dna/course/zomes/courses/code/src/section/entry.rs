@@ -7,49 +7,45 @@ use hdk::{
 use holochain_entry_utils::HolochainEntry;
 
 #[derive(Serialize, Deserialize, Debug, DefaultJson, Clone)]
-pub struct Content {
+pub struct Section {
     pub title: String,
-    pub url: String,
-    pub description: String,
+    pub course_anchor_address: Address,
     pub timestamp: u64,
-    pub section_anchor_address: Address,
+    pub anchor_address: Address,
 }
 
-impl Content {
+impl Section {
     pub fn new(
         title: String,
-        url: String,
-        description: String,
+        course_anchor_address: Address,
         timestamp: u64,
-        section_anchor_address: Address,
+        anchor_address: Address,
     ) -> Self {
-        Content {
+        Section {
             title: title,
-            url: url,
-            description: description,
+            course_anchor_address: course_anchor_address,
             timestamp: timestamp,
-            section_anchor_address: section_anchor_address,
+            anchor_address: anchor_address,
         }
     }
 }
 
-impl HolochainEntry for Content {
+impl HolochainEntry for Section {
     fn entry_type() -> String {
-        String::from("content")
+        String::from("section")
     }
 }
 
-// Holochain entry definition for Content
-pub fn content_entry_def() -> ValidatingEntryType {
+pub fn entry_def() -> ValidatingEntryType {
     entry!(
-        name: Content::entry_type(),
-        description: "this is the definition of section content",
+        name: Section::entry_type(),
+        description: "this is the definition of section",
         sharing: Sharing::Public,
         validation_package: || {
             hdk::ValidationPackageDefinition::Entry
         },
-        validation: | validation_data: hdk::EntryValidationData<Content>| {
-            match validation_data {
+        validation: | validation_data: hdk::EntryValidationData<Section>| {
+            match  validation_data {
                 EntryValidationData::Create { .. } => {
                     Ok(())
                 },
@@ -61,6 +57,8 @@ pub fn content_entry_def() -> ValidatingEntryType {
                 }
             }
         },
-        links: []
+        // Since now Section entry is a data entry that is hidden behind the SectionAnchor,
+        // there won't be any links that it has.
+        links:[]
     )
 }

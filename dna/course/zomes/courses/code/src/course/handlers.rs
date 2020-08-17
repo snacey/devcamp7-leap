@@ -67,10 +67,24 @@ pub fn create(title: String, timestamp: u64) -> ZomeApiResult<Address> {
     Ok(course_anchor_address)
 }
 
+// wrapper for a generic helper::get_latest_data_entry that instantiates it
+// specifically for the Course datatype
 pub fn get_latest_course(
     course_anchor_address: &Address,
 ) -> ZomeApiResult<Option<(Course, Address)>> {
     helper::get_latest_data_entry::<Course>(course_anchor_address, &CourseAnchor::link_type())
+}
+
+// wrapper for the get_latest_course that only returns Course entry
+// and disregards it's address
+pub fn get_latest_course_entry(course_anchor_address: Address) -> ZomeApiResult<Option<Course>> {
+    let latest_course_result = get_latest_course(&course_anchor_address)?;
+    match latest_course_result {
+        Some((course_entry, _course_entry_address)) => {
+            return Ok(Some(course_entry));
+        }
+        None => return Ok(None),
+    }
 }
 
 // NOTE: this function isn't public because it's only needed in the current module
@@ -213,4 +227,23 @@ pub fn get_students(course_anchor_address: Address) -> ZomeApiResult<Vec<Address
     )?;
 
     Ok(links.addresses())
+}
+
+// NOTE: fun fact for fellow English learners: there isn't a typo because both "enrol" and "enroll" are valid!
+//  See: https://grammarist.com/spelling/enrol-enroll/ for more details
+pub fn enrol_in_course(course_anchor_address: Address) -> ZomeApiResult<Address> {
+    // create a link that would allow student to find course they've enrolled into
+    hdk::link_entries(
+        &AGENT_ADDRESS,
+        &course_anchor_address,
+        STUDENT_TO_COURSE_ANCHOR_LINK,
+        "",
+    )?;
+    // create a link that would allow course to list it's students
+    hdk::link_entries(
+        &course_anchor_address,
+        &AGENT_ADDRESS,
+        COURSE_ANCHOR_TO_STUDENT_LINK,
+        "",
+    )
 }
