@@ -1,12 +1,9 @@
-// use hdk::holochain_persistence_api::cas::content::Address;
-// use hdk::prelude::LinkMatch;
-// use hdk::{
-//     error::{ZomeApiError, ZomeApiResult},
-//     AGENT_ADDRESS,
-// };
-use hdk::prelude::*;
-use hdk::AGENT_ADDRESS;
-
+use hdk::holochain_persistence_api::cas::content::Address;
+use hdk::prelude::LinkMatch;
+use hdk::{
+    error::{ZomeApiError, ZomeApiResult},
+    AGENT_ADDRESS,
+};
 use holochain_entry_utils::HolochainEntry;
 
 use super::anchor::{
@@ -125,6 +122,7 @@ pub fn update(
     // here because it leaves us with inconsistent API. This needs further discussion.
     sections_addresses: Vec<Address>,
     course_anchor_address: &Address,
+    timestamp: u64,
 ) -> ZomeApiResult<Address> {
     let latest_course_result = get_latest_course(course_anchor_address)?;
     match latest_course_result {
@@ -132,6 +130,7 @@ pub fn update(
             // update this course
             previous_course.title = title;
             previous_course.sections = sections_addresses;
+            previous_course.timestamp = timestamp;
 
             commit_update(
                 previous_course,
@@ -249,4 +248,62 @@ pub fn enrol_in_course(course_anchor_address: Address) -> ZomeApiResult<Address>
         COURSE_ANCHOR_TO_STUDENT_LINK,
         "",
     )
+}
+
+pub fn add_section(
+    course_anchor_address: &Address,
+    section_anchor_address: &Address,
+    timestamp: u64,
+) -> ZomeApiResult<Address> {
+    let latest_course_result = get_latest_course(course_anchor_address)?;
+    match latest_course_result {
+        Some((mut previous_course, previous_course_address)) => {
+            previous_course
+                .sections
+                .push(section_anchor_address.clone());
+            previous_course.timestamp = timestamp;
+            // we won't use this new address but we need to save method's result somewhere
+            // so this variable is prefixed with _
+            let _new_course_address = commit_update(
+                previous_course,
+                &previous_course_address,
+                course_anchor_address,
+            )?;
+
+            Ok(course_anchor_address.clone())
+        }
+        None => {
+            return Err(ZomeApiError::from(
+                "Can't add section to a deleted course".to_owned(),
+            ));
+        }
+    }
+}
+
+pub fn delete_section(
+    course_anchor_address: &Address,
+    section_anchor_address: &Address,
+    timestamp: u64,
+) -> ZomeApiResult<Address> {
+    let latest_course_result = get_latest_course(course_anchor_address)?;
+    match latest_course_result {
+        Some((mut previous_course, previous_course_address)) => {
+            previous_course.sections.remove_item(section_anchor_address);
+            previous_course.timestamp = timestamp;
+            // we won't use this new address but we need to save method's result somewhere
+            // so this variable is prefixed with _
+            let _new_course_address = commit_update(
+                previous_course,
+                &previous_course_address,
+                course_anchor_address,
+            )?;
+
+            Ok(course_anchor_address.clone())
+        }
+        None => {
+            return Err(ZomeApiError::from(
+                "Can't delete section from a deleted course".to_owned(),
+            ));
+        }
+    }
 }

@@ -1,64 +1,88 @@
-use hdk::{
-    entry_definition::ValidatingEntryType,
-    holochain_core_types::{dna::entry_types::Sharing, validation::EntryValidationData},
-    holochain_json_api::{error::JsonError, json::JsonString},
-    holochain_persistence_api::cas::content::Address,
-};
+use super::entry::Section;
+use crate::anchor_trait::AnchorTrait;
+use crate::content::entry::Content;
+
+use hdk::prelude::*;
 use holochain_entry_utils::HolochainEntry;
 
-#[derive(Serialize, Deserialize, Debug, DefaultJson, Clone)]
-pub struct Section {
+pub const SECTION_TO_CONTENT_LINK: &str = "section_anchor->content";
+
+#[derive(Serialize, Deserialize, Debug, self::DefaultJson, Clone)]
+pub struct SectionAnchor {
+    // NOTE: these fields are here to ensure the uniqueness of every particular anchor
+    //  and wouldn't be used to display data about section to a user
     pub title: String,
     pub course_anchor_address: Address,
     pub timestamp: u64,
-    pub anchor_address: Address,
 }
 
-impl Section {
-    pub fn new(
-        title: String,
-        course_anchor_address: Address,
-        timestamp: u64,
-        anchor_address: Address,
-    ) -> Self {
-        Section {
+impl AnchorTrait for SectionAnchor {
+    fn entry_type() -> String {
+        String::from("section_anchor")
+    }
+    fn link_to() -> String {
+        Section::entry_type()
+    }
+    fn link_type() -> String {
+        "section_anchor->section".to_string()
+    }
+}
+
+impl SectionAnchor {
+    pub fn new(title: String, course_anchor_address: Address, timestamp: u64) -> Self {
+        SectionAnchor {
             title: title,
             course_anchor_address: course_anchor_address,
             timestamp: timestamp,
-            anchor_address: anchor_address,
         }
     }
 }
 
-impl HolochainEntry for Section {
-    fn entry_type() -> String {
-        String::from("section")
-    }
-}
-
-pub fn entry_def() -> ValidatingEntryType {
+pub fn section_anchor_def() -> ValidatingEntryType {
     entry!(
-        name: Section::entry_type(),
-        description: "this is the definition of section",
+        name: SectionAnchor::entry_type(),
+        description: "Anchor to the valid course section",
         sharing: Sharing::Public,
         validation_package: || {
             hdk::ValidationPackageDefinition::Entry
         },
-        validation: | validation_data: hdk::EntryValidationData<Section>| {
-            match  validation_data {
+        validation: | validation_data: hdk::EntryValidationData<SectionAnchor>| {
+            match validation_data{
                 EntryValidationData::Create { .. } => {
+                    // TODO: implement validation
+                     Ok(())
+                 },
+                 EntryValidationData::Modify { .. } => {
+                     // TODO: implement validation
                     Ok(())
-                },
-                EntryValidationData::Modify { .. } => {
+                 },
+                 EntryValidationData::Delete { .. } => {
+                     // TODO: implement validation
                     Ok(())
-                },
-                EntryValidationData::Delete { .. } => {
-                    Ok(())
-                }
+                 }
             }
         },
-        // Since now Section entry is a data entry that is hidden behind the SectionAnchor,
-        // there won't be any links that it has.
-        links:[]
+        links:[
+            to!(
+                SectionAnchor::link_to(),
+                link_type: SectionAnchor::link_type(),
+                validation_package:||{
+                    hdk::ValidationPackageDefinition::Entry
+                },
+                validation:|_validation_data: hdk::LinkValidationData|{
+                   Ok(())
+                }
+            ),
+            to!(
+                Content::entry_type(),
+                link_type: SECTION_TO_CONTENT_LINK,
+                validation_package:||{
+                    hdk::ValidationPackageDefinition::Entry
+                },
+                validation:|_validation_data: hdk::LinkValidationData|{
+                    Ok(())
+                }
+            )
+        ]
     )
 }
