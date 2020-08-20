@@ -1,10 +1,15 @@
+use super::validation;
 use hdk::{
     entry_definition::ValidatingEntryType,
     holochain_core_types::{dna::entry_types::Sharing, validation::EntryValidationData},
     holochain_json_api::{error::JsonError, json::JsonString},
     holochain_persistence_api::cas::content::Address,
 };
+// use hdk::{LinkValidationData, ValidationData};
+
 use holochain_entry_utils::HolochainEntry;
+
+pub const MAX_TITLE_LEN: usize = 50;
 
 #[derive(Serialize, Deserialize, Debug, DefaultJson, Clone)]
 pub struct Section {
@@ -46,17 +51,14 @@ pub fn entry_def() -> ValidatingEntryType {
         },
         validation: | validation_data: hdk::EntryValidationData<Section>| {
             match  validation_data {
-                EntryValidationData::Create { .. } => {
-                    // TODO: implement validation
-                    Ok(())
+                EntryValidationData::Create { entry, validation_data } => {
+                    validation::create(entry, validation_data)
                 },
-                EntryValidationData::Modify { .. } => {
-                    // TODO: implement validation
-                    Ok(())
+                EntryValidationData::Modify { new_entry, old_entry, old_entry_header, validation_data } => {
+                    validation::modify(new_entry, old_entry, old_entry_header, validation_data)
                 },
-                EntryValidationData::Delete { .. } => {
-                    // TODO: implement validation
-                    Ok(())
+                EntryValidationData::Delete { old_entry, old_entry_header, validation_data } => {
+                    validation::delete(old_entry, old_entry_header, validation_data)
                 }
             }
         },
