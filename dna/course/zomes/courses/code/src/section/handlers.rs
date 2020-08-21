@@ -1,4 +1,5 @@
 use hdk::prelude::*;
+use hdk::AGENT_ADDRESS;
 use holochain_entry_utils::HolochainEntry;
 
 use super::anchor::SectionAnchor;
@@ -24,10 +25,14 @@ pub fn create(
             // commit SectionAnchor to DHT
             let section_anchor_address = hdk::commit_entry(&section_anchor.entry())?;
 
+            // Place to store the teacher_address
+            let teacher_address = AGENT_ADDRESS.clone();
+
             // initialize Section instance without commiting it to DHT: we'll need it to commit anchor
             let new_section = Section::new(
                 title,
                 course_anchor_address.clone(),
+                teacher_address.to_owned().into(),
                 timestamp,
                 section_anchor_address.clone(),
             );

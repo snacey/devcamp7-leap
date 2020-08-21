@@ -15,6 +15,7 @@ pub const MAX_TITLE_LEN: usize = 50;
 pub struct Section {
     pub title: String,
     pub course_anchor_address: Address,
+    pub teacher_address: Address,
     pub timestamp: u64,
     pub anchor_address: Address,
 }
@@ -23,12 +24,14 @@ impl Section {
     pub fn new(
         title: String,
         course_anchor_address: Address,
+        teacher_address: Address,
         timestamp: u64,
         anchor_address: Address,
     ) -> Self {
         Section {
             title: title,
             course_anchor_address: course_anchor_address,
+            teacher_address: teacher_address,
             timestamp: timestamp,
             anchor_address: anchor_address,
         }
